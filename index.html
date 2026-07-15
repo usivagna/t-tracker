@@ -687,11 +687,12 @@
       saveLogs(logs.slice(0, MAX_LOG_DAYS));
     }
     function formatDate(dateStr) {
-      // Append local noon (not UTC) so getDay/getMonth/getDate return the correct local date.
-      // A bare date string like "2026-07-15" parsed without a time is treated as UTC midnight,
-      // which would shift to the previous day for users in UTC-offset timezones. Local noon is
-      // always safe because it can never cross a midnight boundary in any timezone.
-      var d = new Date(dateStr + 'T12:00:00');
+      // Parse year/month/day components directly to avoid ambiguity from string-based Date parsing
+      // (e.g., bare date strings are treated as UTC midnight, which shifts the date in negative-offset
+      // timezones; appending a time suffix risks DST edge cases). Component-based construction always
+      // creates a local-time Date at midnight, which correctly reflects the stored calendar date.
+      var parts = dateStr.split('-');
+      var d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
       var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
       var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       return { dow: days[d.getDay()], short: months[d.getMonth()] + ' ' + d.getDate() };
@@ -713,13 +714,19 @@
       var sessionDone = today && today[session];
 
       if (sessionDone) {
-        var comeBack = session === 'morning' ? 'this afternoon or evening' : 'tomorrow morning';
+        // Use static HTML structure and set dynamic text via textContent to prevent XSS
+        var sessionLabels = { morning: 'Morning', evening: 'Evening' };
+        var sessionIcons  = { morning: '&#9728;&#65039;', evening: '&#127769;' };
+        var comeBackMap   = { morning: 'this afternoon or evening', evening: 'tomorrow morning' };
         card.innerHTML = '<div class="checkin-card">' +
-          '<span class="badge-ok">&#10003; ' + (session === 'morning' ? 'Morning' : 'Evening') + ' logged</span>' +
-          '<h3>' + (session === 'morning' ? '&#9728;&#65039; Morning' : '&#127769; Evening') + ' check-in</h3>' +
-          '<p class="sub">Already logged for this session. Come back ' + comeBack + ' to log again.</p>' +
+          '<span class="badge-ok" id="badgeLabel"></span>' +
+          '<h3 id="checkinHeading"></h3>' +
+          '<p class="sub">Already logged for this session. Come back <span id="comeBackText"></span> to log again.</p>' +
           '<button class="btn btn-ghost" id="relogBtn" style="padding:9px 18px;font-size:14px;">Re-log this session</button>' +
           '</div>';
+        document.getElementById('badgeLabel').textContent = '\u2713 ' + sessionLabels[session] + ' logged';
+        document.getElementById('checkinHeading').innerHTML = sessionIcons[session] + ' ' + sessionLabels[session] + ' check-in';
+        document.getElementById('comeBackText').textContent = comeBackMap[session];
         document.getElementById('relogBtn').addEventListener('click', function () {
           ratings = {};
           renderCheckinForm(card, session);
@@ -790,7 +797,7 @@
           return;
         }
         var data = {
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
           energy: ratings.energy, mood: ratings.mood, focus: ratings.focus, drive: ratings.drive,
         };
         if (session === 'morning') {
