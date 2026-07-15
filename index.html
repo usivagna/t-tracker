@@ -641,6 +641,12 @@
   // ===================== TRACKER =====================
   (function () {
     var LOGS_KEY = 'ttracker_logs_v1';
+    var EVENING_START_HOUR = 14;  // 2 PM — sessions before this are "morning"
+    var MAX_LOG_DAYS = 90;        // number of daily entries to retain in localStorage
+    var DISPLAY_HISTORY_DAYS = 14; // number of past entries shown in the history view
+    var UI_REFRESH_DELAY_MS = 600; // ms to show the success message before refreshing the UI
+    var SLEEP_MIN = 3;            // minimum sleep hours accepted in the check-in form
+    var SLEEP_MAX = 14;           // maximum sleep hours accepted in the check-in form
     var METRICS = [
       { id: 'energy', label: 'Energy' },
       { id: 'mood',   label: 'Mood'   },
@@ -649,16 +655,21 @@
     ];
 
     function getLogs() {
-      try { return JSON.parse(localStorage.getItem(LOGS_KEY) || '[]'); } catch (e) { return []; }
+      try { return JSON.parse(localStorage.getItem(LOGS_KEY) || '[]'); } catch (e) {
+        console.warn('T-Tracker: failed to parse stored logs, resetting.', e);
+        return [];
+      }
     }
     function saveLogs(logs) {
-      try { localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); } catch (e) {}
+      try { localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); } catch (e) {
+        console.warn('T-Tracker: could not save logs (localStorage unavailable or full).', e);
+      }
     }
     function todayKey() {
       return new Date().toISOString().slice(0, 10);
     }
     function getSession() {
-      return new Date().getHours() < 14 ? 'morning' : 'evening';
+      return new Date().getHours() < EVENING_START_HOUR ? 'morning' : 'evening';
     }
     function getTodayEntry() {
       var logs = getLogs();
@@ -672,9 +683,10 @@
       var entry = idx >= 0 ? logs[idx] : { date: today };
       entry[session] = data;
       if (idx >= 0) logs[idx] = entry; else logs.unshift(entry);
-      saveLogs(logs.slice(0, 90));
+      saveLogs(logs.slice(0, MAX_LOG_DAYS));
     }
     function formatDate(dateStr) {
+      // Force noon to avoid date-shifting across negative-offset timezones
       var d = new Date(dateStr + 'T12:00:00');
       var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
       var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -697,7 +709,6 @@
       var sessionDone = today && today[session];
 
       if (sessionDone) {
-        var otherSession = session === 'morning' ? 'evening' : 'morning';
         var comeBack = session === 'morning' ? 'this afternoon or evening' : 'tomorrow morning';
         card.innerHTML = '<div class="checkin-card">' +
           '<span class="badge-ok">&#10003; ' + (session === 'morning' ? 'Morning' : 'Evening') + ' logged</span>' +
@@ -721,7 +732,7 @@
       var sleepHtml = session === 'morning'
         ? '<div class="sleep-row">' +
             '<label for="sleepInput">Hours of sleep last night</label>' +
-            '<input type="number" id="sleepInput" class="sleep-input" min="3" max="14" step="0.5" placeholder="e.g. 7.5">' +
+            '<input type="number" id="sleepInput" class="sleep-input" min="' + SLEEP_MIN + '" max="' + SLEEP_MAX + '" step="0.5" placeholder="e.g. 7.5">' +
           '</div>'
         : '';
 
@@ -786,7 +797,7 @@
         ratings = {};
         msgEl.textContent = '\u2713 Saved!';
         msgEl.className = 'checkin-msg ok';
-        setTimeout(function () { renderCheckin(); renderTodaySummary(); renderHistory(); }, 600);
+        setTimeout(function () { renderCheckin(); renderTodaySummary(); renderHistory(); }, UI_REFRESH_DELAY_MS);
       });
     }
 
@@ -825,7 +836,7 @@
     function renderHistory() {
       var el = document.getElementById('logHistory');
       if (!el) return;
-      var logs = getLogs().slice(0, 14);
+      var logs = getLogs().slice(0, DISPLAY_HISTORY_DAYS);
 
       if (!logs.length) {
         el.innerHTML = '<p class="no-logs">No logs yet \u2014 start with your first check-in above.</p>';
