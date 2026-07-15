@@ -641,12 +641,12 @@
   // ===================== TRACKER =====================
   (function () {
     var LOGS_KEY = 'ttracker_logs_v1';
-    var EVENING_START_HOUR = 14;  // 2 PM — sessions before this are "morning"
-    var MAX_LOG_DAYS = 90;        // number of daily entries to retain in localStorage
+    var EVENING_START_HOUR = 14;   // 2 PM -- sessions before this hour are "morning"
+    var MAX_LOG_DAYS = 90;         // number of daily entries to retain in localStorage
     var DISPLAY_HISTORY_DAYS = 14; // number of past entries shown in the history view
     var UI_REFRESH_DELAY_MS = 600; // ms to show the success message before refreshing the UI
-    var SLEEP_MIN = 3;            // minimum sleep hours accepted in the check-in form
-    var SLEEP_MAX = 14;           // maximum sleep hours accepted in the check-in form
+    var SLEEP_MIN = 3;             // minimum sleep hours accepted in the check-in form
+    var SLEEP_MAX = 14;            // maximum sleep hours accepted in the check-in form
     var METRICS = [
       { id: 'energy', label: 'Energy' },
       { id: 'mood',   label: 'Mood'   },
@@ -656,7 +656,8 @@
 
     function getLogs() {
       try { return JSON.parse(localStorage.getItem(LOGS_KEY) || '[]'); } catch (e) {
-        console.warn('T-Tracker: failed to parse stored logs, resetting.', e);
+        console.warn('T-Tracker: failed to parse stored logs, clearing corrupted data.', e);
+        try { localStorage.removeItem(LOGS_KEY); } catch (re) { /* ignore */ }
         return [];
       }
     }
@@ -686,7 +687,10 @@
       saveLogs(logs.slice(0, MAX_LOG_DAYS));
     }
     function formatDate(dateStr) {
-      // Force noon to avoid date-shifting across negative-offset timezones
+      // Append local noon (not UTC) so getDay/getMonth/getDate return the correct local date.
+      // A bare date string like "2026-07-15" parsed without a time is treated as UTC midnight,
+      // which would shift to the previous day for users in UTC-offset timezones. Local noon is
+      // always safe because it can never cross a midnight boundary in any timezone.
       var d = new Date(dateStr + 'T12:00:00');
       var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
       var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -791,11 +795,20 @@
         };
         if (session === 'morning') {
           var sleepEl = document.getElementById('sleepInput');
-          if (sleepEl && sleepEl.value) data.sleep = parseFloat(sleepEl.value);
+          if (sleepEl && sleepEl.value) {
+            var sleepVal = parseFloat(sleepEl.value);
+            if (!isNaN(sleepVal) && sleepVal >= SLEEP_MIN && sleepVal <= SLEEP_MAX) {
+              data.sleep = sleepVal;
+            } else if (!isNaN(sleepVal)) {
+              msgEl.textContent = 'Sleep hours must be between ' + SLEEP_MIN + ' and ' + SLEEP_MAX + '.';
+              msgEl.className = 'checkin-msg err';
+              return;
+            }
+          }
         }
         saveSession(session, data);
         ratings = {};
-        msgEl.textContent = '\u2713 Saved!';
+        msgEl.textContent = 'Check-in saved!';
         msgEl.className = 'checkin-msg ok';
         setTimeout(function () { renderCheckin(); renderTodaySummary(); renderHistory(); }, UI_REFRESH_DELAY_MS);
       });
