@@ -216,14 +216,117 @@
   }
   .pulse { animation: pulse 4s ease-in-out infinite; transform-origin: center; }
   @keyframes pulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+
+  /* ANNOUNCEMENT BANNER */
+  .announce-bar {
+    background: linear-gradient(90deg, rgba(255,138,61,0.18), rgba(79,124,255,0.18));
+    border-bottom: 1px solid var(--line); text-align: center;
+    padding: 9px 22px; font-size: 13.5px; color: var(--ink-soft);
+  }
+  .announce-bar b { color: var(--brand-2); }
+  .announce-bar .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,138,61,0.18); border: 1px solid rgba(255,138,61,0.35);
+    border-radius: 999px; padding: 2px 10px; font-weight: 700; font-size: 12px;
+    color: var(--brand-2); margin-right: 8px; vertical-align: middle;
+  }
+
+  /* TRACKER */
+  .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+  @media (max-width: 760px){ .tracker-grid { grid-template-columns: 1fr; } }
+
+  .checkin-card {
+    background: linear-gradient(180deg, var(--card), var(--card-2));
+    border: 1px solid var(--line); border-radius: var(--radius); padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .checkin-card h3 { font-size: 20px; margin-bottom: 6px; }
+  .checkin-card .sub { color: var(--ink-mute); font-size: 13px; margin: 0 0 22px; }
+
+  .metric-row { margin-bottom: 20px; }
+  .metric-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .metric-label span:first-child { font-weight: 700; font-size: 15px; }
+  .metric-label .val-badge {
+    background: rgba(255,138,61,0.18); color: var(--brand-2);
+    border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 700;
+    min-width: 36px; text-align: center;
+  }
+  .rating-btns { display: flex; gap: 8px; }
+  .rating-btn {
+    flex: 1; padding: 10px 0; border: 1px solid var(--line); border-radius: 10px;
+    background: rgba(255,255,255,0.03); color: var(--ink-soft); font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: background .1s, border-color .1s, color .1s;
+    font-family: var(--font);
+  }
+  .rating-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+  .rating-btn.selected { background: rgba(255,138,61,0.20); border-color: var(--brand); color: var(--brand-2); }
+
+  .sleep-row { margin-bottom: 22px; }
+  .sleep-row label { display: block; font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .sleep-input {
+    width: 100%; padding: 11px 14px; border-radius: 12px;
+    border: 1px solid var(--line); background: rgba(0,0,0,0.22); color: var(--ink);
+    font-size: 15px; font-family: var(--font);
+  }
+  .sleep-input:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+
+  .checkin-footer { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+  .checkin-msg { font-size: 14px; font-weight: 700; min-height: 20px; }
+  .checkin-msg.ok { color: var(--good); }
+  .checkin-msg.err { color: #ff8a8a; }
+
+  .summary-card {
+    background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px;
+  }
+  .summary-card h3 { font-size: 18px; margin-bottom: 18px; }
+  .summary-sessions { display: grid; gap: 14px; }
+  .session-block { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 14px 16px; }
+  .session-block h4 { margin: 0 0 10px; font-size: 14px; color: var(--ink-soft); font-weight: 700; }
+  .metric-bars { display: grid; gap: 6px; }
+  .metric-bar-row { display: flex; gap: 10px; align-items: center; font-size: 13px; }
+  .metric-bar-label { min-width: 52px; color: var(--ink-mute); }
+  .bar-track { flex: 1; background: rgba(255,255,255,0.07); border-radius: 999px; height: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width .4s ease; }
+  .metric-bar-val { min-width: 16px; text-align: right; font-weight: 700; color: var(--brand-2); font-size: 13px; }
+  .empty-state { color: var(--ink-mute); font-size: 14px; padding: 10px 0; margin: 0; }
+  .badge-ok {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(52,211,153,0.12); color: var(--good);
+    border: 1px solid rgba(52,211,153,0.3); border-radius: 999px;
+    padding: 3px 12px; font-size: 13px; font-weight: 700; margin-bottom: 14px;
+  }
+
+  .log-history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .log-history-header h3 { font-size: 20px; margin: 0; }
+  .log-entries { display: grid; gap: 12px; }
+  .log-entry {
+    background: var(--bg-soft); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 20px; display: grid; grid-template-columns: 120px 1fr 1fr; gap: 12px 20px; align-items: start;
+  }
+  @media (max-width: 640px){ .log-entry { grid-template-columns: 1fr; } }
+  .log-date { font-weight: 800; font-size: 14px; color: var(--ink-soft); }
+  .log-date .dow { font-size: 12px; color: var(--ink-mute); font-weight: 600; display: block; }
+  .log-session h4 { margin: 0 0 6px; font-size: 12.5px; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+  .mini-bars { display: grid; gap: 4px; }
+  .mini-bar-row { display: flex; gap: 8px; align-items: center; font-size: 12px; }
+  .mini-bar-label { min-width: 44px; color: var(--ink-mute); }
+  .mini-dots { display: flex; gap: 3px; }
+  .mini-dot { width: 10px; height: 10px; border-radius: 3px; background: rgba(255,255,255,0.08); }
+  .no-logs { color: var(--ink-mute); font-size: 15px; padding: 20px 0; }
 </style>
 </head>
 <body>
+
+<div class="announce-bar" role="banner">
+  <span class="pill">🎉 News</span>
+  T&#8209;Tracker has raised <b>$10 in seed funding</b> — we're building this for real. Thank you for your support!
+</div>
 
 <header class="nav">
   <div class="wrap nav-inner">
     <div class="brand"><span class="dot">T</span> T&#8209;Tracker</div>
     <nav class="nav-links" aria-label="Primary">
+      <a class="link" href="#tracker">Tracker</a>
       <a class="link" href="#science">The Science</a>
       <a class="link" href="#features">Features</a>
       <a class="link" href="#how">How it works</a>
@@ -404,6 +507,22 @@
     </div>
   </section>
 
+  <!-- TRACKER -->
+  <section id="tracker">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Daily tracker</span>
+        <h2>Log your daily rhythm.</h2>
+        <p>Takes under a minute. Rate energy, mood, focus and drive morning and evening to reveal your personal 24-hour pattern. Everything stays in your browser — nothing is sent anywhere.</p>
+      </div>
+      <div class="tracker-grid">
+        <div id="checkinCard"></div>
+        <div id="todaySummary"></div>
+      </div>
+      <div id="logHistory"></div>
+    </div>
+  </section>
+
   <!-- WAITLIST -->
   <section id="waitlist">
     <div class="wrap">
@@ -518,6 +637,279 @@
       msg.className = 'form-msg ok';
       form.reset();
     });
+  })();
+  // ===================== TRACKER =====================
+  (function () {
+    var LOGS_KEY = 'ttracker_logs_v1';
+    var EVENING_START_HOUR = 14;   // 2 PM -- sessions before this hour are "morning"
+    var MAX_LOG_DAYS = 90;         // number of daily entries to retain in localStorage
+    var DISPLAY_HISTORY_DAYS = 14; // number of past entries shown in the history view
+    var UI_REFRESH_DELAY_MS = 600; // ms to show the success message before refreshing the UI
+    var SLEEP_MIN = 3;             // minimum sleep hours accepted in the check-in form
+    var SLEEP_MAX = 14;            // maximum sleep hours accepted in the check-in form
+    var METRICS = [
+      { id: 'energy', label: 'Energy' },
+      { id: 'mood',   label: 'Mood'   },
+      { id: 'focus',  label: 'Focus'  },
+      { id: 'drive',  label: 'Drive'  },
+    ];
+
+    function getLogs() {
+      try { return JSON.parse(localStorage.getItem(LOGS_KEY) || '[]'); } catch (e) {
+        console.warn('T-Tracker: failed to parse stored logs, clearing corrupted data.', e);
+        try { localStorage.removeItem(LOGS_KEY); } catch (re) { /* ignore */ }
+        return [];
+      }
+    }
+    function saveLogs(logs) {
+      try { localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); } catch (e) {
+        console.warn('T-Tracker: could not save logs (localStorage unavailable or full).', e);
+      }
+    }
+    function todayKey() {
+      return new Date().toISOString().slice(0, 10);
+    }
+    function getSession() {
+      return new Date().getHours() < EVENING_START_HOUR ? 'morning' : 'evening';
+    }
+    function getTodayEntry() {
+      var logs = getLogs();
+      var today = todayKey();
+      return logs.find(function (l) { return l.date === today; }) || null;
+    }
+    function saveSession(session, data) {
+      var logs = getLogs();
+      var today = todayKey();
+      var idx = logs.findIndex(function (l) { return l.date === today; });
+      var entry = idx >= 0 ? logs[idx] : { date: today };
+      entry[session] = data;
+      if (idx >= 0) logs[idx] = entry; else logs.unshift(entry);
+      saveLogs(logs.slice(0, MAX_LOG_DAYS));
+    }
+    function formatDate(dateStr) {
+      // Parse year/month/day components directly to avoid ambiguity from string-based Date parsing
+      // (e.g., bare date strings are treated as UTC midnight, which shifts the date in negative-offset
+      // timezones; appending a time suffix risks DST edge cases). Component-based construction always
+      // creates a local-time Date at midnight, which correctly reflects the stored calendar date.
+      var parts = dateStr.split('-');
+      var d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return { dow: days[d.getDay()], short: months[d.getMonth()] + ' ' + d.getDate() };
+    }
+    function ratingColor(v) {
+      if (v >= 4) return '#34d399';
+      if (v >= 3) return '#ffb15c';
+      return '#ff8a8a';
+    }
+
+    var ratings = {};
+
+    // --- Check-in ---
+    function renderCheckin() {
+      var card = document.getElementById('checkinCard');
+      if (!card) return;
+      var session = getSession();
+      var today = getTodayEntry();
+      var sessionDone = today && today[session];
+
+      if (sessionDone) {
+        // Use static HTML structure and set dynamic text via textContent to prevent XSS
+        var sessionLabels = { morning: 'Morning', evening: 'Evening' };
+        var sessionIcons  = { morning: '&#9728;&#65039;', evening: '&#127769;' };
+        var comeBackMap   = { morning: 'this afternoon or evening', evening: 'tomorrow morning' };
+        card.innerHTML = '<div class="checkin-card">' +
+          '<span class="badge-ok" id="badgeLabel"></span>' +
+          '<h3 id="checkinHeading"></h3>' +
+          '<p class="sub">Already logged for this session. Come back <span id="comeBackText"></span> to log again.</p>' +
+          '<button class="btn btn-ghost" id="relogBtn" style="padding:9px 18px;font-size:14px;">Re-log this session</button>' +
+          '</div>';
+        document.getElementById('badgeLabel').textContent = '\u2713 ' + sessionLabels[session] + ' logged';
+        document.getElementById('checkinHeading').innerHTML = sessionIcons[session] + ' ' + sessionLabels[session] + ' check-in';
+        document.getElementById('comeBackText').textContent = comeBackMap[session];
+        document.getElementById('relogBtn').addEventListener('click', function () {
+          ratings = {};
+          renderCheckinForm(card, session);
+        });
+        return;
+      }
+      renderCheckinForm(card, session);
+    }
+
+    function renderCheckinForm(card, session) {
+      var sessionLabel = session === 'morning' ? '&#9728;&#65039; Morning check-in' : '&#127769; Evening check-in';
+      var sessionSub   = session === 'morning' ? 'How are you starting the day? Rate 1 (low) to 5 (high).' : 'How did the day go? Rate 1 (low) to 5 (high).';
+
+      var sleepHtml = session === 'morning'
+        ? '<div class="sleep-row">' +
+            '<label for="sleepInput">Hours of sleep last night</label>' +
+            '<input type="number" id="sleepInput" class="sleep-input" min="' + SLEEP_MIN + '" max="' + SLEEP_MAX + '" step="0.5" placeholder="e.g. 7.5">' +
+          '</div>'
+        : '';
+
+      var metricsHtml = METRICS.map(function (m) {
+        return '<div class="metric-row">' +
+          '<div class="metric-label"><span>' + m.label + '</span><span class="val-badge" id="val-' + m.id + '">\u2014</span></div>' +
+          '<div class="rating-btns">' +
+          [1,2,3,4,5].map(function (n) {
+            return '<button type="button" class="rating-btn" data-metric="' + m.id + '" data-val="' + n + '">' + n + '</button>';
+          }).join('') +
+          '</div></div>';
+      }).join('');
+
+      card.innerHTML = '<div class="checkin-card">' +
+        '<h3>' + sessionLabel + '</h3>' +
+        '<p class="sub">' + sessionSub + '</p>' +
+        sleepHtml + metricsHtml +
+        '<div class="checkin-footer">' +
+          '<button class="btn btn-primary" id="submitCheckin" style="padding:11px 22px;">Save check-in</button>' +
+          '<div class="checkin-msg" id="checkinMsg"></div>' +
+        '</div></div>';
+
+      // Restore any pre-selected ratings
+      Object.keys(ratings).forEach(function (metric) {
+        var v = ratings[metric];
+        if (!v) return;
+        var btn = card.querySelector('[data-metric="' + metric + '"][data-val="' + v + '"]');
+        if (btn) btn.classList.add('selected');
+        var badge = card.querySelector('#val-' + metric);
+        if (badge) badge.textContent = v;
+      });
+
+      card.querySelectorAll('.rating-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var metric = btn.dataset.metric;
+          var val = parseInt(btn.dataset.val, 10);
+          ratings[metric] = val;
+          card.querySelectorAll('[data-metric="' + metric + '"]').forEach(function (b) { b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          var badge = card.querySelector('#val-' + metric);
+          if (badge) badge.textContent = val;
+        });
+      });
+
+      document.getElementById('submitCheckin').addEventListener('click', function () {
+        var msgEl = document.getElementById('checkinMsg');
+        var missing = METRICS.filter(function (m) { return !ratings[m.id]; }).map(function (m) { return m.label; });
+        if (missing.length) {
+          msgEl.textContent = 'Please rate: ' + missing.join(', ');
+          msgEl.className = 'checkin-msg err';
+          return;
+        }
+        var data = {
+          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          energy: ratings.energy, mood: ratings.mood, focus: ratings.focus, drive: ratings.drive,
+        };
+        if (session === 'morning') {
+          var sleepEl = document.getElementById('sleepInput');
+          if (sleepEl && sleepEl.value) {
+            var sleepVal = parseFloat(sleepEl.value);
+            if (!isNaN(sleepVal) && sleepVal >= SLEEP_MIN && sleepVal <= SLEEP_MAX) {
+              data.sleep = sleepVal;
+            } else if (!isNaN(sleepVal)) {
+              msgEl.textContent = 'Sleep hours must be between ' + SLEEP_MIN + ' and ' + SLEEP_MAX + '.';
+              msgEl.className = 'checkin-msg err';
+              return;
+            }
+          }
+        }
+        saveSession(session, data);
+        ratings = {};
+        msgEl.textContent = 'Check-in saved!';
+        msgEl.className = 'checkin-msg ok';
+        setTimeout(function () { renderCheckin(); renderTodaySummary(); renderHistory(); }, UI_REFRESH_DELAY_MS);
+      });
+    }
+
+    // --- Today's summary ---
+    function renderTodaySummary() {
+      var el = document.getElementById('todaySummary');
+      if (!el) return;
+      var today = getTodayEntry();
+
+      var sessionsHtml = ['morning', 'evening'].map(function (sess) {
+        var s = today && today[sess];
+        var icon = sess === 'morning' ? '&#9728;&#65039;' : '&#127769;';
+        var label = icon + ' ' + sess.charAt(0).toUpperCase() + sess.slice(1);
+        if (!s) {
+          return '<div class="session-block"><h4>' + label + '</h4><p class="empty-state">Not logged yet</p></div>';
+        }
+        var barsHtml = METRICS.map(function (m) {
+          var v = s[m.id] || 0;
+          return '<div class="metric-bar-row">' +
+            '<span class="metric-bar-label">' + m.label + '</span>' +
+            '<div class="bar-track"><div class="bar-fill" style="width:' + (v * 20) + '%;background:' + ratingColor(v) + '"></div></div>' +
+            '<span class="metric-bar-val">' + v + '</span>' +
+          '</div>';
+        }).join('');
+        var sleepNote = (sess === 'morning' && s.sleep)
+          ? '<p style="font-size:12px;color:var(--ink-mute);margin:8px 0 0;">' + s.sleep + 'h sleep</p>' : '';
+        return '<div class="session-block">' +
+          '<h4>' + label + ' <span style="font-size:11px;font-weight:600;color:var(--ink-mute);">' + s.time + '</span></h4>' +
+          '<div class="metric-bars">' + barsHtml + '</div>' + sleepNote + '</div>';
+      }).join('');
+
+      el.innerHTML = '<div class="summary-card"><h3>Today\'s log</h3><div class="summary-sessions">' + sessionsHtml + '</div></div>';
+    }
+
+    // --- History ---
+    function renderHistory() {
+      var el = document.getElementById('logHistory');
+      if (!el) return;
+      var logs = getLogs().slice(0, DISPLAY_HISTORY_DAYS);
+
+      if (!logs.length) {
+        el.innerHTML = '<p class="no-logs">No logs yet \u2014 start with your first check-in above.</p>';
+        return;
+      }
+
+      function sessionBlock(entry, sess) {
+        var s = entry[sess];
+        var icon = sess === 'morning' ? '&#9728;&#65039;' : '&#127769;';
+        var label = icon + ' ' + sess.charAt(0).toUpperCase() + sess.slice(1);
+        if (!s) return '<div class="log-session"><h4>' + label + '</h4><p style="font-size:12.5px;color:var(--ink-mute);margin:0;">\u2014</p></div>';
+        var dotsHtml = METRICS.map(function (m) {
+          var v = s[m.id] || 0;
+          return '<div class="mini-bar-row"><span class="mini-bar-label">' + m.label + '</span>' +
+            '<div class="mini-dots">' +
+            [1,2,3,4,5].map(function (n) {
+              return '<span class="mini-dot' + (n <= v ? ' on' : '') + '"' + (n <= v ? ' style="background:' + ratingColor(v) + '"' : '') + '></span>';
+            }).join('') +
+            '</div></div>';
+        }).join('');
+        var sleepNote = (sess === 'morning' && s.sleep) ? '<p style="font-size:11.5px;color:var(--ink-mute);margin:6px 0 0;">' + s.sleep + 'h sleep</p>' : '';
+        return '<div class="log-session"><h4>' + label + '</h4><div class="mini-bars">' + dotsHtml + '</div>' + sleepNote + '</div>';
+      }
+
+      var entriesHtml = logs.map(function (entry) {
+        var df = formatDate(entry.date);
+        var todayTag = entry.date === todayKey() ? ' <span style="color:var(--brand-2);font-size:12px;">(Today)</span>' : '';
+        return '<div class="log-entry">' +
+          '<div class="log-date"><span class="dow">' + df.dow + '</span>' + df.short + todayTag + '</div>' +
+          sessionBlock(entry, 'morning') +
+          sessionBlock(entry, 'evening') +
+          '</div>';
+      }).join('');
+
+      el.innerHTML = '<div class="log-history-header">' +
+        '<h3>Your log history</h3>' +
+        '<button class="btn btn-ghost" id="clearLogsBtn" style="padding:8px 16px;font-size:13px;color:var(--ink-mute);">Clear all</button>' +
+        '</div><div class="log-entries">' + entriesHtml + '</div>';
+
+      document.getElementById('clearLogsBtn').addEventListener('click', function () {
+        if (confirm('Clear all log data? This cannot be undone.')) {
+          saveLogs([]);
+          ratings = {};
+          renderCheckin();
+          renderTodaySummary();
+          renderHistory();
+        }
+      });
+    }
+
+    renderCheckin();
+    renderTodaySummary();
+    renderHistory();
   })();
 </script>
 </body>
