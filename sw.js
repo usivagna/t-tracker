@@ -37,6 +37,7 @@ self.addEventListener('fetch', function (event) {
         });
         return response;
       }).catch(function () {
+        console.warn('T-Tracker: serving the cached app while offline.');
         return caches.match('./index.html');
       });
     })
