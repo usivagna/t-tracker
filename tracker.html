@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0b1020" />
+<link rel="manifest" href="manifest.json" />
+<title>T-Tracker — Daily check-in</title>
+<meta name="description" content="Log your daily energy, mood, focus and drive." />
+<style>
+  :root { --bg:#0b1020; --bg-soft:#111834; --card:#151d3b; --card-2:#1a2347; --ink:#eef1fb; --ink-soft:#aeb6d6; --ink-mute:#7c86ad; --brand:#ff8a3d; --brand-2:#ffb15c; --good:#34d399; --line:rgba(255,255,255,.08); --radius:18px; --shadow:0 20px 50px -20px rgba(0,0,0,.6); --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  * { box-sizing:border-box; } body { margin:0; color:var(--ink); background:radial-gradient(900px 500px at 0 0,rgba(255,138,61,.16),transparent 55%),var(--bg); font-family:var(--font); line-height:1.6; }
+  a { color:inherit; } .wrap { max-width:900px; margin:0 auto; padding:0 22px; } header { border-bottom:1px solid var(--line); background:rgba(11,16,32,.8); }
+  .nav { height:66px; display:flex; align-items:center; justify-content:space-between; } .brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:18px; }
+  .dot { width:26px; height:26px; border-radius:8px; display:grid; place-items:center; background:linear-gradient(135deg,var(--brand),#4f7cff); }
+  .back { color:var(--ink-soft); font-size:14px; font-weight:600; text-decoration:none; } .back:hover { color:var(--ink); }
+  main { padding:64px 0; } h1,h2,h3,h4 { line-height:1.15; margin:0; } h1 { font-size:clamp(32px,6vw,52px); } h2 { font-size:28px; } p { color:var(--ink-soft); }
+  .eyebrow { color:var(--brand-2); font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; } .intro { margin-bottom:34px; }
+  .intro p { max-width:650px; margin:14px 0 0; font-size:17px; } .tracker-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:32px; }
+  .checkin-card,.summary-card { border:1px solid var(--line); border-radius:var(--radius); padding:28px; } .checkin-card { background:linear-gradient(180deg,var(--card),var(--card-2)); box-shadow:var(--shadow); }
+  .summary-card { background:var(--bg-soft); } .checkin-card h3 { font-size:20px; margin-bottom:6px; } .sub { color:var(--ink-mute); font-size:13px; margin:0 0 22px; }
+  .metric-row,.sleep-row { margin-bottom:20px; } .metric-label { display:flex; justify-content:space-between; margin-bottom:8px; } .metric-label span:first-child,.sleep-row label { font-weight:700; font-size:15px; }
+  .val-badge { background:rgba(255,138,61,.18); color:var(--brand-2); border-radius:999px; padding:2px 10px; font-size:13px; font-weight:700; min-width:36px; text-align:center; }
+  .rating-btns { display:flex; gap:8px; } .rating-btn { flex:1; padding:10px 0; border:1px solid var(--line); border-radius:10px; background:rgba(255,255,255,.03); color:var(--ink-soft); font:700 15px var(--font); cursor:pointer; }
+  .rating-btn.selected { background:rgba(255,138,61,.2); border-color:var(--brand); color:var(--brand-2); } .sleep-row label { display:block; margin-bottom:8px; }
+  .sleep-input { width:100%; padding:11px 14px; border-radius:12px; border:1px solid var(--line); background:rgba(0,0,0,.22); color:var(--ink); font:15px var(--font); }
+  .checkin-footer { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:6px; } .checkin-msg { font-size:14px; font-weight:700; min-height:20px; }
+  .checkin-msg.ok,.badge-ok { color:var(--good); } .checkin-msg.err { color:#ff8a8a; } .badge-ok { display:inline-flex; margin-bottom:14px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; padding:11px 22px; border-radius:999px; border:1px solid transparent; font-weight:700; cursor:pointer; text-decoration:none; }
+  .btn-primary { background:linear-gradient(135deg,var(--brand),var(--brand-2)); color:#2a1500; } .btn-ghost { background:rgba(255,255,255,.04); border-color:var(--line); color:var(--ink); }
+  .summary-card h3 { font-size:18px; margin-bottom:18px; } .summary-sessions,.log-entries { display:grid; gap:14px; } .session-block { background:rgba(0,0,0,.2); border-radius:12px; padding:14px 16px; }
+  .session-block h4 { margin:0 0 10px; font-size:14px; color:var(--ink-soft); } .metric-bars,.mini-bars { display:grid; gap:6px; } .metric-bar-row,.mini-bar-row { display:flex; gap:10px; align-items:center; font-size:13px; }
+  .metric-bar-label { min-width:52px; color:var(--ink-mute); } .bar-track { flex:1; background:rgba(255,255,255,.07); border-radius:999px; height:6px; overflow:hidden; } .bar-fill { height:100%; border-radius:999px; }
+  .metric-bar-val { min-width:16px; text-align:right; color:var(--brand-2); } .empty-state,.no-logs { color:var(--ink-mute); font-size:14px; } .log-history-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+  .log-history-header h3 { font-size:20px; } .log-entry { background:var(--bg-soft); border:1px solid var(--line); border-radius:14px; padding:16px 20px; display:grid; grid-template-columns:120px 1fr 1fr; gap:12px 20px; }
+  .log-date { font-weight:800; font-size:14px; color:var(--ink-soft); } .log-date .dow { display:block; color:var(--ink-mute); font-size:12px; } .log-session h4 { margin:0 0 6px; color:var(--ink-mute); font-size:12.5px; text-transform:uppercase; }
+  .mini-bar-label { min-width:44px; color:var(--ink-mute); } .mini-dots { display:flex; gap:3px; } .mini-dot { width:10px; height:10px; border-radius:3px; background:rgba(255,255,255,.08); }
+  @media (max-width:760px) { .tracker-grid { grid-template-columns:1fr; } } @media (max-width:640px) { .log-entry { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="brand" href="index.html"><span class="dot">T</span>T-Tracker</a><a class="back" href="index.html">&larr; Back to overview</a></div></header>
+<main><div class="wrap">
+  <div class="intro"><span class="eyebrow">Daily tracker</span><h1>Log your daily rhythm.</h1><p>Rate energy, mood, focus and drive morning and evening. Your entries stay in this browser and help reveal your personal 24-hour pattern.</p></div>
+  <div class="tracker-grid"><div id="checkinCard"></div><div id="todaySummary"></div></div>
+  <div id="logHistory"></div>
+</div></main>
+<script src="tracker.js"></script>
+</body>
+</html>
