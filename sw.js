@@ -33,8 +33,9 @@ self.addEventListener('fetch', function (event) {
       return cached || fetch(event.request).then(function (response) {
         var copy = response.clone();
         return caches.open(CACHE_NAME).then(function (cache) {
-          cache.put(event.request, copy);
-          return response;
+          return cache.put(event.request, copy).then(function () {
+            return response;
+          });
         });
       }).catch(function () {
         console.warn('T-Tracker: serving the cached app while offline.');

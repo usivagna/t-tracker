@@ -686,7 +686,7 @@
       return new Promise(function (resolve) {
         var request = indexedDB.open('ttracker', 1);
         request.onupgradeneeded = function () {
-          // One small record makes trimming the bounded 90-day log atomic and simple.
+          // A single "daily" record replaces the whole bounded 90-day array atomically.
           request.result.createObjectStore('logs');
         };
         request.onerror = function () {
@@ -703,10 +703,10 @@
             resolve();
           };
           read.onsuccess = function () {
-            var dbLogs = Array.isArray(read.result) ? read.result : null;
-            logsCache = dbLogs || readLegacyLogs();
+            var persistedLogs = Array.isArray(read.result) ? read.result : null;
+            logsCache = persistedLogs || readLegacyLogs();
             // Copy existing localStorage data into IndexedDB once for returning users.
-            if (!dbLogs) saveLogs(logsCache);
+            if (!persistedLogs) saveLogs(logsCache);
             resolve();
           };
         };
