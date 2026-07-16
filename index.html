@@ -686,7 +686,7 @@
       return new Promise(function (resolve) {
         var request = indexedDB.open('ttracker', 1);
         request.onupgradeneeded = function () {
-          // One record keeps the bounded 90-day log atomic and easy to replace.
+          // One small record makes trimming the bounded 90-day log atomic and simple.
           request.result.createObjectStore('logs');
         };
         request.onerror = function () {
@@ -703,10 +703,10 @@
             resolve();
           };
           read.onsuccess = function () {
-            var storedLogs = Array.isArray(read.result) ? read.result : null;
-            logsCache = storedLogs || readLegacyLogs();
+            var dbLogs = Array.isArray(read.result) ? read.result : null;
+            logsCache = dbLogs || readLegacyLogs();
             // Copy existing localStorage data into IndexedDB once for returning users.
-            if (!storedLogs) saveLogs(logsCache);
+            if (!dbLogs) saveLogs(logsCache);
             resolve();
           };
         };
@@ -721,7 +721,7 @@
       logsCache = logs;
       if (logsDb) {
         try {
-          // The explicit "daily" key stores the bounded log as one atomic record.
+          // The explicit "daily" key keeps this small bounded log atomic.
           var write = logsDb.transaction('logs', 'readwrite').objectStore('logs').put(logs, 'daily');
           write.onerror = function () {
             console.warn('T-Tracker: could not save logs to the database.', write.error);

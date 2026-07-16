@@ -32,13 +32,18 @@ self.addEventListener('fetch', function (event) {
     caches.match(event.request).then(function (cached) {
       return cached || fetch(event.request).then(function (response) {
         var copy = response.clone();
-        caches.open(CACHE_NAME).then(function (cache) {
+        return caches.open(CACHE_NAME).then(function (cache) {
           cache.put(event.request, copy);
+          return response;
         });
-        return response;
       }).catch(function () {
         console.warn('T-Tracker: serving the cached app while offline.');
-        return caches.match('./index.html');
+        return caches.match('./index.html').then(function (fallback) {
+          return fallback || new Response('T-Tracker is offline.', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain' }
+          });
+        });
       });
     })
   );
