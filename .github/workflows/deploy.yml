@@ -30,7 +30,7 @@ jobs:
       - name: Prepare site files
         run: |
           mkdir -p public
-          cp index.html public/
+          cp index.html tracker.html tracker.js manifest.json sw.js icon.svg icon-512.png public/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
