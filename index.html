@@ -702,8 +702,9 @@
             resolve();
           };
           read.onsuccess = function () {
-            logsCache = Array.isArray(read.result) ? read.result : readLegacyLogs();
-            if (!Array.isArray(read.result)) saveLogs(logsCache);
+            var storedLogs = Array.isArray(read.result);
+            logsCache = storedLogs ? read.result : readLegacyLogs();
+            if (!storedLogs) saveLogs(logsCache);
             resolve();
           };
         };
@@ -718,6 +719,7 @@
       logsCache = logs;
       if (logsDb) {
         try {
+          // The store uses the explicit "daily" key so all daily entries are saved together.
           var write = logsDb.transaction('logs', 'readwrite').objectStore('logs').put(logs, 'daily');
           write.onerror = function () {
             console.warn('T-Tracker: could not save logs to the database.', write.error);

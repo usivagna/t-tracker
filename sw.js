@@ -36,6 +36,8 @@ self.addEventListener('fetch', function (event) {
           cache.put(event.request, copy);
         });
         return response;
+      }).catch(function () {
+        return caches.match('./index.html');
       });
     })
   );
