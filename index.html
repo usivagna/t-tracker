@@ -702,8 +702,8 @@
             resolve();
           };
           read.onsuccess = function () {
-            var storedLogs = Array.isArray(read.result);
-            logsCache = storedLogs ? read.result : readLegacyLogs();
+            var storedLogs = Array.isArray(read.result) ? read.result : null;
+            logsCache = storedLogs || readLegacyLogs();
             if (!storedLogs) saveLogs(logsCache);
             resolve();
           };
