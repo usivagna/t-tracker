@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0b1020" />
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="manifest.json" />
 <title>T-Tracker — Know your daily rhythm</title>
 <meta name="description" content="T-Tracker maps your energy, mood, focus and drive to your body's natural 24-hour hormonal rhythm. The daily-cycle tracker for men." />
 <style>
@@ -602,6 +605,14 @@
 </footer>
 
 <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function (error) {
+        console.warn('T-Tracker: offline support unavailable.', error);
+      });
+    });
+  }
+
   document.getElementById('year').textContent = new Date().getFullYear();
 
   (function () {
@@ -642,7 +653,7 @@
   (function () {
     var LOGS_KEY = 'ttracker_logs_v1';
     var EVENING_START_HOUR = 14;   // 2 PM -- sessions before this hour are "morning"
-    var MAX_LOG_DAYS = 90;         // number of daily entries to retain in localStorage
+    var MAX_LOG_DAYS = 90;         // number of daily entries to retain in the database
     var DISPLAY_HISTORY_DAYS = 14; // number of past entries shown in the history view
     var UI_REFRESH_DELAY_MS = 600; // ms to show the success message before refreshing the UI
     var SLEEP_MIN = 3;             // minimum sleep hours accepted in the check-in form
@@ -654,17 +665,82 @@
       { id: 'drive',  label: 'Drive'  },
     ];
 
-    function getLogs() {
-      try { return JSON.parse(localStorage.getItem(LOGS_KEY) || '[]'); } catch (e) {
-        console.warn('T-Tracker: failed to parse stored logs, clearing corrupted data.', e);
-        try { localStorage.removeItem(LOGS_KEY); } catch (re) { /* ignore */ }
+    var logsCache = [];
+    var logsDb = null;
+
+    function readLegacyLogs() {
+      try {
+        var stored = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        return Array.isArray(stored) ? stored : [];
+      } catch (e) {
+        console.warn('T-Tracker: failed to parse legacy logs.', e);
         return [];
       }
     }
-    function saveLogs(logs) {
-      try { localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); } catch (e) {
-        console.warn('T-Tracker: could not save logs (localStorage unavailable or full).', e);
+
+    function initDatabase() {
+      if (!window.indexedDB) {
+        logsCache = readLegacyLogs();
+        return Promise.resolve();
       }
+      return new Promise(function (resolve) {
+        var request = indexedDB.open('ttracker', 1);
+        request.onupgradeneeded = function () {
+          // A single manually keyed "daily" record replaces the whole bounded array atomically.
+          request.result.createObjectStore('logs');
+        };
+        request.onerror = function () {
+          console.warn('T-Tracker: database unavailable; using in-memory logs.', request.error);
+          logsDb = null;
+          logsCache = readLegacyLogs();
+          resolve();
+        };
+        request.onsuccess = function () {
+          logsDb = request.result;
+          var read = logsDb.transaction('logs', 'readonly').objectStore('logs').get('daily');
+          read.onerror = function () {
+            logsCache = readLegacyLogs();
+            resolve();
+          };
+          read.onsuccess = function () {
+            var persistedLogs = Array.isArray(read.result) ? read.result : null;
+            logsCache = persistedLogs || readLegacyLogs();
+            // Copy existing localStorage data into IndexedDB once for returning users.
+            if (!persistedLogs) {
+              saveLogs(logsCache).then(resolve);
+            } else {
+              resolve();
+            }
+          };
+        };
+      });
+    }
+
+    function getLogs() {
+      return logsCache;
+    }
+
+    function saveLogs(logs) {
+      logsCache = logs;
+      if (logsDb) {
+        try {
+          // The explicit "daily" key keeps this small bounded log atomic.
+          var write = logsDb.transaction('logs', 'readwrite').objectStore('logs').put(logs, 'daily');
+          return new Promise(function (resolve) {
+            write.onerror = function () {
+              console.warn('T-Tracker: could not save logs to the database.', write.error);
+              resolve();
+            };
+            write.onsuccess = resolve;
+          });
+        } catch (e) {
+          console.warn('T-Tracker: database write failed.', e);
+        }
+      }
+      try { localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); } catch (e) {
+        console.warn('T-Tracker: could not save logs.', e);
+      }
+      return Promise.resolve();
     }
     function todayKey() {
       return new Date().toISOString().slice(0, 10);
@@ -907,9 +983,11 @@
       });
     }
 
-    renderCheckin();
-    renderTodaySummary();
-    renderHistory();
+    initDatabase().then(function () {
+      renderCheckin();
+      renderTodaySummary();
+      renderHistory();
+    });
   })();
 </script>
 </body>
