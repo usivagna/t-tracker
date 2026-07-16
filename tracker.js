@@ -1,5 +1,4 @@
 (function () {
-
     var LOGS_KEY = 'ttracker_logs_v1';
     var EVENING_START_HOUR = 14;   // 2 PM -- sessions before this hour are "morning"
     var MAX_LOG_DAYS = 90;         // number of daily entries to retain in the database
