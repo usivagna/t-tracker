@@ -686,7 +686,7 @@
       return new Promise(function (resolve) {
         var request = indexedDB.open('ttracker', 1);
         request.onupgradeneeded = function () {
-          // A single "daily" record replaces the whole bounded 90-day array atomically.
+          // A single manually keyed "daily" record replaces the whole bounded array atomically.
           request.result.createObjectStore('logs');
         };
         request.onerror = function () {
@@ -706,8 +706,11 @@
             var persistedLogs = Array.isArray(read.result) ? read.result : null;
             logsCache = persistedLogs || readLegacyLogs();
             // Copy existing localStorage data into IndexedDB once for returning users.
-            if (!persistedLogs) saveLogs(logsCache);
-            resolve();
+            if (!persistedLogs) {
+              saveLogs(logsCache).then(resolve);
+            } else {
+              resolve();
+            }
           };
         };
       });
@@ -723,10 +726,13 @@
         try {
           // The explicit "daily" key keeps this small bounded log atomic.
           var write = logsDb.transaction('logs', 'readwrite').objectStore('logs').put(logs, 'daily');
-          write.onerror = function () {
-            console.warn('T-Tracker: could not save logs to the database.', write.error);
-          };
-          return;
+          return new Promise(function (resolve) {
+            write.onerror = function () {
+              console.warn('T-Tracker: could not save logs to the database.', write.error);
+              resolve();
+            };
+            write.onsuccess = resolve;
+          });
         } catch (e) {
           console.warn('T-Tracker: database write failed.', e);
         }
@@ -734,6 +740,7 @@
       try { localStorage.setItem(LOGS_KEY, JSON.stringify(logs)); } catch (e) {
         console.warn('T-Tracker: could not save logs.', e);
       }
+      return Promise.resolve();
     }
     function todayKey() {
       return new Date().toISOString().slice(0, 10);
