@@ -1,7 +1,9 @@
-var CACHE_NAME = 'ttracker-shell-v1';
+var CACHE_NAME = 'ttracker-shell-v2';
 var APP_SHELL = [
   './',
   './index.html',
+  './tracker.html',
+  './tracker.js',
   './manifest.json',
   './icon.svg'
 ];
