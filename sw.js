@@ -5,7 +5,8 @@ var APP_SHELL = [
   './tracker.html',
   './tracker.js',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', function (event) {
